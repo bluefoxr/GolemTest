@@ -32,13 +32,28 @@ app_ui <- function(request) {
       ),
 
       tabPanel(
-        "Selction",
-        DTOutput("analysis_table"),
-        actionButton("remove_indicator", label = "Remove indicator"),
-        actionButton("add_indicator", label = "Add indicator"),
-        checkboxInput("filter_table", "Filter to flagged indicators", value = FALSE)
+        "Selection",
+        fluidRow(
+          column(
+            8,
+            DTOutput("analysis_table"),
+            actionButton("remove_indicator", label = "Remove indicator"),
+            actionButton("add_indicator", label = "Add indicator"),
+            checkboxInput("filter_table", "Filter to flagged indicators", value = FALSE)
+          ),
+          column(
+            4,
+            plotlyOutput("violin_plot", height = "700px")
+          )
+        )
       ),
-      tabPanel("Build", "three"),
+      tabPanel(
+        "Build",
+        fillPage(
+          leaflet::leafletOutput("map", width = "700px", height = "700px")
+        )
+
+      ),
       tabPanel("Results")
     )
   )
