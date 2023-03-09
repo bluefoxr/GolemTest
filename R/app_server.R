@@ -74,12 +74,21 @@ app_server <- function(input, output, session) {
     }
   })
 
+  # selected code from table
+  icode_selected <- reactiveVal(NULL)
+
+  observeEvent(input$analysis_table_rows_selected, {
+    icode_selected(
+      l_analysis()$FlaggedStats$iCode[input$analysis_table_rows_selected]
+    )
+  })
+
   # Remove indicators
   observeEvent(input$remove_indicator, {
 
     # get code and remove, regenerate coin
-    icode_to_remove <- l_analysis()$FlaggedStats$iCode[input$analysis_table_rows_selected]
-    coin(f_remove_indicators(coin(), icode_to_remove))
+    #icode_to_remove <- l_analysis()$FlaggedStats$iCode[input$analysis_table_rows_selected]
+    coin(f_remove_indicators(coin(), icode_selected()))
 
   })
 
@@ -87,8 +96,37 @@ app_server <- function(input, output, session) {
   observeEvent(input$add_indicator, {
 
     # get code and remove, regenerate coin
-    icode_to_remove <- l_analysis()$FlaggedStats$iCode[input$analysis_table_rows_selected]
-    coin(f_add_indicators(coin(), icode_to_remove))
+    #icode_to_remove <- l_analysis()$FlaggedStats$iCode[input$analysis_table_rows_selected]
+    coin(f_add_indicators(coin(), icode_selected()))
+
+  })
+
+  # violin plot
+  output$violin_plot <- renderPlotly({
+    if(!is.null(icode_selected())){
+      iCOINr::iplot_dist(coin(), dset = "Raw", iCode = icode_selected(), ptype = "Violin")
+    } else {
+      NULL
+    }
+  })
+
+
+  # RESULTS -----------------------------------------------------------------
+
+  output$map <- leaflet::renderLeaflet({
+
+    coin(f_build_index(coin()))
+
+   # CANNOT FIND FILE PATH?
+
+    shapefile_path <- system.file(
+      "shp",
+      "gtm_admbnda_adm2_ocha_conred_20190207.shp",
+      package = "GolemTest"
+    )
+
+    f_plot_map(coin(), dset = "Aggregated", iCode = "MVI",
+               shp_path = shapefile_path)
 
   })
 
