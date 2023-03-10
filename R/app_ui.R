@@ -1,3 +1,5 @@
+
+
 #' The application User-Interface
 #'
 #' @param request Internal parameter for `{shiny}`.
@@ -49,8 +51,31 @@ app_ui <- function(request) {
       ),
       tabPanel(
         "Build",
-        fillPage(
-          leaflet::leafletOutput("map", width = "700px", height = "700px")
+        fluidPage(
+          tags$style("
+        #controls {
+          background-color: #ddd;
+          opacity: 0.5;
+        }
+        #controls:hover{
+          opacity: 1;
+        }
+               "),
+          absolutePanel(
+            id = "controls",
+            class = "panel panel-default",
+            top = 125, right = 100, left = "auto", bottom = "auto",
+            width = 300, fixed=TRUE,
+            draggable = TRUE, height = "auto",
+            h3("Test Panel"),
+            "This is a test panel with some stuff",
+            br(),br(),
+            selectInput("agg_method", "Aggregation method",
+                        list("Arithmetic mean" = "a_amean",
+                             "Geometric mean" = "a_gmean")),
+            style = "z-index: 10; padding-top: 10px; padding-left: 10px; padding-right: 10px;",
+          ),
+          leaflet::leafletOutput("map", height = "90vh")
         )
 
       ),
